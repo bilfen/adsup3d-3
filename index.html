@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilfen AD'S UP v3 — Yerel 3D Motor (kotasız)</title>
+<meta name="description" content="Görselini yükle, Hunyuan3D-2 ile 3D modele dönüşsün; tarayıcında dönen modeli video olarak indir.">
+<link rel="icon" href="assets/banner.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#e63946; --amber:#f4a417; --green:#2a9d53; --blue:#1274bf; --magenta:#b30f76;
+    --ink:#17202a; --muted:#5f6b7a; --line:#e6e9ee; --card:#ffffff; --bg:#f4f5f7;
+    --shadow:0 1px 2px rgba(23,32,42,.05), 0 8px 24px -12px rgba(23,32,42,.12);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Inter","Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+
+  /* Üst çubuk */
+  .topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+  .topbar .inner{max-width:1120px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}
+  .brand .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--red),var(--amber),var(--green),var(--blue),var(--magenta))}
+  .topbar nav{margin-left:auto;display:flex;gap:18px;font-size:14px}
+  .topbar nav a{color:var(--muted);text-decoration:none;font-weight:500}
+  .topbar nav a:hover{color:var(--ink)}
+  .topbar .cta{background:var(--ink);color:#fff;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;text-decoration:none}
+  .topbar .cta:hover{opacity:.9}
+
+  /* Hero: banner ana görsel */
+  .hero{max-width:1120px;margin:24px auto 0;padding:0 24px}
+  .heroCard{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+  .heroCard img{width:100%;display:block;aspect-ratio:3406/1252;object-fit:cover}
+  .heroBody{padding:28px 32px 30px;display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap}
+  .heroBody h1{margin:0;font-size:clamp(22px,3.2vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .heroBody h1 .grad{background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--blue),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .heroBody p{margin:10px 0 0;color:var(--muted);font-size:15.5px;max-width:640px;line-height:1.6}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:12.5px;font-weight:600}
+  .badge.b-blue{background:#e8f4fd;color:#0b5d95}
+  .badge.b-green{background:#e9f7ee;color:#1d7a41}
+  .badge.b-amber{background:#fdf3e3;color:#9a6a0a}
+
+  main{max-width:1120px;margin:0 auto;padding:26px 24px 40px}
+
+  /* Adım şeridi */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 22px}
+  @media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .step::before{content:"";position:absolute;inset:0 auto 0 0;width:4px}
+  .step:nth-child(1)::before{background:var(--red)} .step:nth-child(2)::before{background:var(--amber)}
+  .step:nth-child(3)::before{background:var(--green)} .step:nth-child(4)::before{background:var(--blue)}
+  .step .n{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+  .step b{display:block;margin:4px 0 2px;font-size:15px}
+  .step span{color:var(--muted);font-size:13px;line-height:1.5;display:block}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .card>h2{margin:0 0 6px;font-size:18px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  .card>.sub{margin:0 0 16px;color:var(--muted);font-size:13.5px}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:var(--ink);color:#fff;font-size:13px;font-weight:700}
+
+  /* Yükleme alanı */
+  .drop{position:relative;border:2.5px dashed #b9c5d4;border-radius:20px;padding:56px 32px;text-align:center;cursor:pointer;transition:.18s;background:linear-gradient(180deg,#f8fafc,#f1f5f9);min-height:230px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+  .drop:hover,.drop.over{border-color:var(--blue);background:linear-gradient(180deg,#f0f7fe,#e8f2fd);box-shadow:inset 0 0 0 4px rgba(18,116,191,.08)}
+  .drop .em{font-size:56px;margin-bottom:14px;filter:drop-shadow(0 6px 12px rgba(18,116,191,.18))}
+  .drop b{font-size:24px;font-weight:700;letter-spacing:-.02em}
+  .drop .hint{color:#334155;font-size:15.5px;font-weight:500;background:#e8f4fd;padding:10px 22px;border-radius:999px;margin-top:14px}
+  .drop::after{content:"";position:absolute;inset:-2.5px;border-radius:20px;pointer-events:none}
+  @media(max-width:640px){.drop{padding:40px 20px;min-height:190px}.drop b{font-size:20px}.drop .em{font-size:44px}.drop .hint{font-size:14px;padding:8px 16px}}
+  .preview{max-width:300px;max-height:220px;border-radius:12px;display:none;margin:16px auto 4px;box-shadow:var(--shadow)}
+  button{font:inherit;border:0;border-radius:999px;padding:12px 24px;cursor:pointer;font-weight:600;transition:.15s}
+  .btn-primary{background:linear-gradient(90deg,var(--red),var(--amber),var(--green),var(--blue),var(--magenta));color:#fff;box-shadow:0 6px 18px -6px rgba(18,116,191,.4)}
+  .btn-primary:hover{filter:brightness(1.07)}
+  .btn-primary:disabled,.btn-ghost:disabled{opacity:.45;cursor:not-allowed}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{background:#f6f8fa;border-color:#d6dce4}
+  #btnOlustur{margin-top:16px;width:100%;font-size:16px}
+
+  .status{margin-top:14px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .bar{height:8px;background:#e9edf2;border-radius:999px;overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;width:5%;background:linear-gradient(90deg,var(--blue),var(--magenta));transition:width .4s;border-radius:999px}
+  .log{margin-top:12px;font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);max-height:120px;overflow:auto;background:#f8f9fb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:none}
+
+  /* 3D bölüm */
+  .recgrid{display:grid;grid-template-columns:250px 1fr;gap:18px}
+  @media(max-width:860px){.recgrid{grid-template-columns:1fr}}
+  .stageWrap{position:relative;width:100%}
+  #c3d{width:100%;height:480px;border-radius:14px;background:radial-gradient(1200px 500px at 50% -10%,#1c2940,#0f172a);display:block;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .stageLogo{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.88);padding:7px 11px;border-radius:10px;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.22);display:flex;align-items:center}
+  .stageLogo img{width:clamp(80px,14vw,110px);height:auto;display:block;opacity:.92}
+  .side{display:flex;flex-direction:column;gap:9px}
+  .side .note{font-size:12px;color:var(--muted);line-height:1.55}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;background:#e8f4fd;color:#0b5d95;font-size:11.5px;font-weight:700;letter-spacing:.02em}
+  video{width:100%;border-radius:12px;background:#000;max-height:360px;display:block}
+  .vidcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;margin-top:14px}
+  .vidcard .meta{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+  .dl{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#0b5d95;font-weight:600;font-size:13.5px;background:#e8f4fd;padding:7px 14px;border-radius:999px}
+  .dl:hover{background:#d8ecfa}
+
+  /* Bilgi bölümü */
+  .info{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:860px){
+    .info{grid-template-columns:1fr}
+    .recgrid{grid-template-columns:1fr}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .topbar nav a:not(.cta){display:none}
+    main{padding:20px 14px 40px}
+    .hero{padding:0 14px}
+    .heroBody{padding:20px 20px 24px}
+    #c3d{height:360px}
+  }
+  @media(max-width:480px){
+    .steps{grid-template-columns:1fr}
+    .drop b{letter-spacing:-.01em}
+    button{width:100%}
+    .side{width:100%}
+    .recgrid .side button{min-height:48px}
+  }
+  .infoItem{display:flex;gap:12px}
+  .infoItem .ic{flex:0 0 auto;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .infoItem:nth-child(1) .ic{background:#e9f7ee}
+  .infoItem:nth-child(2) .ic{background:#e8f4fd}
+  .infoItem:nth-child(3) .ic{background:#fdf3e3}
+  .infoItem:nth-child(4) .ic{background:#fdeef3}
+  .infoItem b{display:block;font-size:14.5px;margin-bottom:3px}
+  .infoItem p{margin:0;font-size:13px;color:var(--muted);line-height:1.55}
+
+  footer{border-top:1px solid var(--line);background:#fff}
+  .footerIn{max-width:1120px;margin:0 auto;padding:22px 24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+  .footerIn .dot{width:9px;height:9px;border-radius:999px;background:linear-gradient(135deg,var(--red),var(--amber),var(--green),var(--blue),var(--magenta))}
+  .footerIn .right{margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <div class="brand"><span class="dot"></span> BILFEN · AD'S UP</div>
+    <nav>
+      <a href="#yukle">Görsel Yükle</a>
+      <a href="#viz">3D İzle</a>
+      <a href="#bilgi">Nasıl Çalışır?</a>
+      <a class="cta" href="#yukle">Başla →</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="heroCard">
+    <img src="assets/banner.jpg" alt="Bilfen AD'S UP">
+    <div class="heroBody">
+      <div>
+        <h1>Görselden <span class="grad">3D Animasyon Videosuna</span></h1>
+        <p>Çizimini veya fotoğrafını yükle; Tencent Hunyuan3D-2 yapay zekâsı görseli 3D modele dönüştürsün. Modeli tarayıcında dönerken izle, tek tuşla video olarak indir.</p>
+        <div class="badges">
+          <span class="badge b-blue">🧠 Hunyuan3D-2 AI</span>
+          <span class="badge b-green">🔒 Tamamen tarayıcında</span>
+          <span class="badge b-amber">⚡ ~1 dakikada hazır</span>
+          <span class="badge">🆓 Ücretsiz · Kurulum yok</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="steps">
+    <div class="step"><span class="n">Adım 1</span><b>Görsel yükle</b><span>Nesne, oyuncak, karakter fotoğrafı veya kendi çizimin</span></div>
+    <div class="step"><span class="n">Adım 2</span><b>3D model üret</b><span>Hunyuan3D-2 görseli 3D nesneye dönüştürür</span></div>
+    <div class="step"><span class="n">Adım 3</span><b>Canlı izle / kaydet</b><span>Model tarayıcında döner; fareyle de çevirebilirsin</span></div>
+    <div class="step"><span class="n">Adım 4</span><b>Video indir</b><span>Dönen modeli video dosyası olarak bilgisayarına kaydet</span></div>
+  </div>
+
+  <section class="card" id="yukle">
+    <h2><span class="num">1</span> Görsel yükle</h2>
+    <p class="sub">Sade veya düz arka planlı, tek nesne fotoğrafları en iyi sonucu verir.</p>
+    <div class="drop" id="drop">
+      <div class="em">🖼️</div>
+      <div><b>Görseli buraya sürükle</b></div>
+      <div class="hint">👆 Dokun veya tıkla · PNG / JPG / WebP</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+    <img id="preview" class="preview" alt="Önizleme">
+    <button id="btnOlustur" class="btn-primary" disabled>✨ 3D Model Oluştur</button>
+    <div class="status" id="status">Hazır — bir görsel seçin.</div>
+    <div class="bar" id="bar" style="display:none"><i id="barFill"></i></div>
+    <div class="log" id="log"></div>
+  </section>
+
+  <section class="card" id="secViz" style="display:none">
+    <h2 id="viz"><span class="num">2</span> Modelini izle ve videoya çevir</h2>
+    <p class="sub">Model otomatik döner; kayıt sırasında dönüş otomatik başlar. İstersen fareyle tutup kendin de çevirebilirsin.</p>
+    <div class="recgrid">
+      <div class="side">
+        <button id="btnTurn" class="btn-ghost">🔄 Dönmeyi başlat / durdur</button>
+        <button id="btnRec5" class="btn-ghost">⏱ 10 saniyelik kayıt + indir</button>
+        <button id="btnRecManual" class="btn-ghost">● Kaydı başlat / durdur</button>
+        <span class="note">💡 İpucu: modelin üzerine fareyle basılı tutup sürükle — kendi açını kendin seç.</span>
+        <span class="note">Kaydedilen videolar aşağıda listelenir; <b>⬇ İndir</b> ile bilgisayarına iner.</span>
+      </div>
+      <div class="stageWrap">
+        <canvas id="c3d"></canvas>
+        <div class="stageLogo"><img src="assets/logo.png" alt="Logo"></div>
+      </div>
+    </div>
+    <div id="vidList"></div>
+  </section>
+
+  <section class="card" id="bilgi">
+    <h2><span class="num">3</span> Nasıl çalışır?</h2>
+    <p class="sub">Dört adımda, hiçbir kurulum ve hesap gerektirmeden:</p>
+    <div class="info">
+      <div class="infoItem"><div class="ic">📤</div><div><b>Görsel doğrudan gider</b><p>Yüklediğin görsel tarayıcıdan Hugging Face'teki resmî Tencent Hunyuan3D-2 servisine gider; hiçbir Bilfen sunucusunda saklanmaz.</p></div></div>
+      <div class="infoItem"><div class="ic">🧊</div><div><b>3D model oluşur</b><p>Yapay zekâ, görseldeki nesneyi yorumlayıp saniyeler içinde gerçek bir 3D model (.glb) üretir.</p></div></div>
+      <div class="infoItem"><div class="ic">🎬</div><div><b>Tarayıcında döner</b><p>Model WebGL ile cihazında canlı gösterilir; otomatik döner, sen de fareyle çevirebilirsin.</p></div></div>
+      <div class="infoItem"><div class="ic">⬇️</div><div><b>Video indir</b><p>Kayıt başlatıldığında dönen model videoya çevrilir; tek tuşla bilgisayarına iner. Tüm süreç tarayıcıda çalışır.</p></div></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footerIn">
+    <span class="dot"></span>
+    <span>Bilfen AD'S UP · Görselden 3D Videosuna Atölyesi</span>
+    <span class="right">Model: Tencent-Hunyuan/Hunyuan3D-2 (ücretsiz Hugging Face Space API)</span>
+  </div>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script src="https://accounts.google.com/gsi/client" defer></script>
+<script type="module" src="app.js?v3"></script>
+</body>
+</html>
