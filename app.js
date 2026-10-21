@@ -139,11 +139,12 @@ async function fetchGlb(base, result) {
 }
 
 async function tryGenerationChain(file) {
-  // Zincir: her space için önce generation_all (renkli), sonra shape_generation (beyaz)
+  // Zincir: yalnızca generation_all (renkli). shape_generation (beyaz) yarışa alınmıyor:
+  // yerel renkli sonuçtan önce bitip beyaz modeli göstermesin diye.
   let lastErr = null;
   for (const base of SPACES) {
     const sName = base.replace("https://", "").split(".hf")[0];
-    for (const fn of ["generation_all", "shape_generation"]) {
+    for (const fn of ["generation_all"]) {
       const textured = fn === "generation_all";
       const label = (textured ? "Renkli 3D üretiliyor" : "3D üretiliyor (yedek)") + " — " + sName;
       try {
