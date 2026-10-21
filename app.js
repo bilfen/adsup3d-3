@@ -270,9 +270,14 @@ function drawCompositeFrame() {
   }
 }
 
+// Süre-tabanlı 360° dönüş: kare hızından bağımsız, kayıt sonunda tam bir tur.
+let spin = null; // { t0, dur } — yalnızca 360° kaydı sırasında dolu
 function stepScene() {
   resize();
-  if (turning && model) {
+  if (spin && model) {
+    const p = Math.min(1, (performance.now() - spin.t0) / spin.dur);
+    model.rotation.y = p * Math.PI * 2;
+  } else if (turning && model) {
     model.rotation.y += 0.012;
   }
   controls.update();
@@ -483,13 +488,37 @@ async function saveToDrive(blob, btn) {
 }
 
 $("btnTurn").addEventListener("click", () => { turning = !turning; });
-$("btnRec5").addEventListener("click", async () => {
-  turning = true;
+// 360° video: tam bir tur (8 sn), bitince otomatik indirilir ve listeye eklenir
+const SPIN_MS = 8000;
+async function record360() {
+  if (!model || spin || (recorder && recorder.state === "recording")) return;
+  const btn = $("btnRec5");
+  btn.disabled = true;
+  turning = false;
+  model.rotation.y = 0;
+  setStatus("🎬 360° video kaydediliyor… (" + SPIN_MS / 1000 + " sn)");
   startRecording();
-  await new Promise((r) => setTimeout(r, 10_000));
-  await stopRecording();
-});
+  spin = { t0: performance.now(), dur: SPIN_MS };
+  await new Promise((r) => setTimeout(r, SPIN_MS + 60));
+  spin = null;
+  const blob = await stopRecording();
+  turning = true;
+  if (blob) {
+    const ext = blob.type.includes("mp4") ? "mp4" : "webm";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "adsup-360-" + Date.now() + "." + ext;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setStatus("✔ 360° video indirildi (" + ext.toUpperCase() + ", " + Math.round(blob.size / 1024) + " KB)");
+    log("360° video hazır ve indirildi: " + a.download);
+  }
+  btn.disabled = false;
+}
+$("btnRec5").addEventListener("click", record360);
 $("btnRecManual").addEventListener("click", async () => {
+  if (spin) return; // 360° kaydı sürüyorsa karuşturma
   if (!recorder || recorder.state === "inactive") { startRecording(); $("btnRecManual").textContent = "⏹ Kaydı durdur"; }
   else { await stopRecording(); $("btnRecManual").textContent = "● Kaydı başlat / durdur"; }
 });
@@ -497,6 +526,7 @@ $("btnRecManual").addEventListener("click", async () => {
 // Test / otomasyon kancası
 window.__adsup = { setFile, generate3D, showModel, composite };
 Object.defineProperty(window.__adsup, "lastModel", { value: null, writable: true });
+Object.defineProperty(window.__adsup, "rotY", { get: () => (model ? model.rotation.y : null) });
 
 // Set up generate button
 btnOlustur.addEventListener("click", async () => {
